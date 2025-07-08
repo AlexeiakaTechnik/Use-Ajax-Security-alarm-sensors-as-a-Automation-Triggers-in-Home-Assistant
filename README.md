@@ -23,20 +23,21 @@ _Article on my project on how to use AJAX Security Alarm System sensors(IR) as m
 <!-- Write an engaging intro about the closed nature of AJAX systems.  
 Briefly recap your prior AJAX project (relay hack) and why this SIA automation was your next step. Mention why this can be useful to save up on extra IR/Motion sensors and how home security alarms are usually on standby doing nothing 80% of time. -->
 
-Modern home security systems, like AJAX, are typically designed as **closed ecosystems**. They work great out of the box, but if you want to integrate them into broader smart home automations—good luck.
+Modern home security systems, like AJAX, are typically designed as **closed ecosystems**. They work great out of the box, but if you want to integrate them into broader smart home automations — [good luck with that](https://github.com/AlexeiakaTechnik/AJAX_security-integration-in-Home_Assistant/blob/main/README.md#-why-ajax-doesnt-just-integrate)!
 
-I’ve already tackled AJAX control via **relay hacking** in my previous project, where I did a bit of reverse-engineering and wiring into the SpaceControl key fob to allow Arming and Disarming AJAX via Home Assistant. That solved the “control” problem — but I had another idea after.
+I’ve already tackled AJAX control via **relay hacking** in my previous project, heavily reffered to in this one, where I did a bit of reverse-engineering and wiring into the SpaceControl key fob to allow Arming and Disarming AJAX via Home Assistant. That solved the “control” problem — but I had another idea after that.
 
-This article covers the **next step**: **harnessing the SIA Protocol** to make AJAX’s internal events fully visible and usable in Home Assistant.
+This article covers the next step: **harnessing the SIA Protocol** to make AJAX’s internal events fully visible and usable in Home Assistant. We will not cover [AJAX configuration](https://github.com/AlexeiakaTechnik/AJAX_security-integration-in-Home_Assistant/blob/main/README.md#%EF%B8%8F-ajax-system---devices-groups-and-sia-monitoring-station-setup) or [how to set up SIA Integration](https://github.com/AlexeiakaTechnik/AJAX_security-integration-in-Home_Assistant/blob/main/README.md#-sia-alarm-systems-configuration), assuming you have already done that yourself or with the help of my guides.
 
-Why bother? Because most of the time(in many cases when at least someine is home/in office/site), security systems sit idle — **passively waiting to be used**. Meanwhile, those same sensors (motion detectors, door sensors, IR/cam triggers) could be put to work for:
+_Why bother?_ Because most of the time(in many cases, when at least someone is at home/in office/on site), security systems sit idle — **passively waiting to be used**. Meanwhile, those same sensors (motion detectors, door sensors, IR/cam triggers) could be put to work for:
 
 - **Lighting control**
 - **Presence-based automations**
 - **Notifications or routines**
 
-This approach allows you to maximize value from your existing security gear — **without buying extra motion or IR sensors** — by using the system’s SIA event reporting as a trigger source. And regarding battery drain - from my >3 year experiance, devices that are active even 24/7 do not drain energy as quick as I expected them to. Side note, what actully does drain battery a lot - is the case when your device is far away/behind thick walls from the HUB, and then **a lot** of energy goes to radio to keep up reporting status/establish and re-establish connection, also learned from experience.
+This approach allows you to maximize value from your existing security gear — **without buying extra door/window or IR motion sensors** — by using the system’s SIA event reporting as a trigger source. And regarding battery drain - from my > 3 year experience, devices that are active even 24/7 **do not drain energy as quick as I expected them to**, I actually barely noticed any difference. 
 
+<sub>_Side note_, what actually does drain battery - is the case when your device is far away/behind thick walls from the HUB, and then **a lot** of energy goes to radio to keep up reporting status/establish and re-establish connections(also learned from experience).</sub>
 
 ---
 
