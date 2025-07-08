@@ -95,7 +95,12 @@ To inspect incoming SIA events:
 3. Click Start Listening.
 4. Arm, disarm, or trigger your AJAX detectors(wave hands, open doors) and watch the events appear in real-time.
 
-Example event payload (simplified for illustration):
+SIA Event structure and payload is described in [HA Documentation](https://www.home-assistant.io/integrations/sia/). Here are a few examples with comments:
+
+Example of event payload (simplified for illustration)
+
+<details>
+<summary>📄 Example of event payload (simplified for illustration) (Click to Expand)</summary>
 
 ```yaml
 {
@@ -107,33 +112,229 @@ Example event payload (simplified for illustration):
     "timestamp": "2025-07-08T14:53:00"
   }
 }
+
 ```
+
+</details>
+
+
+Event payload from my HA/AJAX setup with comments:
+
+<details>
+<summary>📄 Event payload from my HA/AJAX setup with comments: (Click to Expand)</summary>
+
+```yaml
+{
+event_type: sia_event_xxx_AAA34 ##where xxx is my port and AAA34 - user id
+data:
+  message_type: SIA-DCS ##Type of SIA message (usually "SIA-DCS" for standard events).
+  receiver: null ##Receiver ID — usually the port or system receiving the event, not important
+  line: L0 ##Communication line/channel (often unused in simple setups). All my events are L0
+  account: AAA34 ##obvious
+  sequence: "5277" ##	Message sequence number (for ordering).
+  content: "#AAA34|Nri8/BA15]_12:06:34,07-08-2025" ##	Full raw SIA message content (undecoded text, rarely needed in automations).
+  ti: null ##	Transmission Identifier—technical field from SIA message (rarely needed).
+  id: null ## Identifier field from SIA message (may duplicate account or zone in some cases).
+  ri: "8" ## THIS is important! Zone or sensor triggering the event. Critical for identifying which device caused the event - zones(Groups) are configured in AJAX App
+  code: BA ## SIA Event Code (e.g., "BA" for Burglary Alarm, "CL" for Closing/Arming). Key for automations. Link to doc in article at the end.
+  message: "15" ## Human-readable description of the event (mapped from code, like "Burglary Alarm").
+  x_data: null ## Extended data included in some SIA messages (usually advanced or manufacturer-specific details).
+  timestamp: "2025-07-08T12:06:34+00:00" ## 	Time of the event.
+  event_qualifier: null ## SIA Qualifier (like "new event" vs. "restore")—used in some events for extra context.
+  event_type: null ##Same as *code* in some cases; sometimes more generalized type info.
+  partition: null ## Partition number—relevant for multi-partition systems (often unused in basic setups).
+  extended_data: null ## Additional extended data (structured, list format)—rare in most home security SIA events.
+  sia_code: ## This one is new, it used to be just the BA/BR/etc. codes, but now its explained! cool!
+    code: BA
+    type: Burglary Alarm
+    description: Burglary zone has been violated while armed
+    concerns: Zone or point ## What this event concerns (e.g., specific zone, device, or system-wide event). Useful for filtering.
+origin: LOCAL ## Where the event originated. "LOCAL" means it was triggered from within Home Assistant itself (versus cloud or external sources).
+time_fired: "2025-07-08T12:06:14.503616+00:00" ## Exact timestamp (UTC) when the event was fired inside Home Assistant.
+context: ## Standard HA context object for event tracking, includes:
+  id: 01JZMYVW77S9JC3NY8TWJX72Z1 ## Unique ID for this specific event in HA’s logs (useful for debugging and linking events). 
+  parent_id: null ## ID of the parent event (if this event was triggered by another event/automation).
+  user_id: null ## ID of the user (if applicable) who triggered the event (usually null for automated events).
+}
+
+```
+
+
+</details>
+
+
+
+By knowing this we can utilize these events to automate some things, like ligthting, for example.
 
 ---
 
 ### ⚙️ Integrating with Home Assistant Automations               <sub>[⬆️ Back to Table of Contents](#table-of-contents)</sub>
 <!-- Show how to build automations based on captured SIA events. Explain your YAML structure step by step. Include a minimal, clean automation example with clear comments. -->
 
-Example Automation - YAML
+To use SIA events in HA Automations we need basic things from the payload, described in YAML example above: 
+```plaintext
+code
+```
+and 
+```plaintext
+ti
+``` 
+
+Where **code** gives us a clue of what kind of event was it and **ri** - what Zone/Group of Devices(room/space) this event originated in. See [SIA Codes document](https://docs.google.com/spreadsheets/d/1-N-RZVS8IiwM5zuw2u4gt8Bx_5xo_JOwuagHJgSJxUw/edit#gid=920971512) for description of alarm codes. Lets look at the example of simple Light Automation using those:
+
+
+<details>
+<summary>📄 Example of simple Light Automation (Click to Expand)</summary>
 
 ```yaml
-alias: 'Intrusion Alarm Lights On'
-trigger:
+alias: 'Room X Lights On for 1m30s' 
+triggers:
   - platform: event
-    event_type: sia_event
+    event_type: sia_event ## set event type
     event_data:
-      code: 'BA'
-action:
-  - service: light.turn_on
+      code: BA ## this is fired when AJAX MotionProtect device is armed(24/7 in our setup) and detects new motion/loud sound event
+      ri: "8" ## this is Group(Zone) which AJAX MotionProtect device is attached to
+conditions:
+  - condition: state
+    entity_id: light.room_x_lights 
+    state: "off" ## lets not fire automation when light is already On in the room X
+actions:
+  - action: light.turn_on ##turn on the light
     target:
-      entity_id: light.entryway_lights
+      entity_id: light.room_x_lights
+  - delay:
+       hours: 0
+       minutes: 1
+       seconds: 30 ## delay for 1m30s
+  - action: light.turn_off
+    target:
+      entity_id: light.room_x_lights ## and turn off the light
 mode: single
 ```
+
+</details>
+
+
+This is the simplest implementation of light automation and it WILL have a lot of issues in a real-world use-case scenario. We can expand and improve the automation from here to cover a lot of different scenarios - please check out my [Light Automations in Smart Home](https://github.com/AlexeiakaTechnik/My-experience-of-improving-Light-Automations-in-Home-Assistant) article on how to do it! 
 
 ---
 
 ### 💡 Example Automations & Use Cases               <sub>[⬆️ Back to Table of Contents](#table-of-contents)</sub>
 <!-- Share your actual real-life automation use cases with AJAX + Home Assistant. Possible examples: - Auto-lights on intrusion - Notification to phone when alarm armed/disarmed - Mode switching based on alarm state Keep it clean and to the point. --> <!-- Also mention you’ve documented dashboard integrations elsewhere, with links to your dashboard article. -->
+
+To expand usage of our AJAX system I have preapared a few examples of automations. Some of them may or may not be used by me in my setup at the moment ;)
+
+   * **Example 1 - ✨ Smart TTS Welcome Automation (with multi-sensor verification)**: 
+   Assumes we have an Entryway with:
+   - Smart speaker(media player)
+   - AJAX DoorProtect sensor on the door in Group 1(ri: 7)
+   - AJAX MotionProtect sensor inside the room in Group 2(ri: 8)
+
+   This Automation will check if Entryway door was opened(BA code fired) and wait for Entryway IR sensor to also fire BA(someone has entered room, not just opened door)
+
+<details>
+<summary>📄 Lets take a look at YAML(see comments): (Click to Expand)</summary>
+
+```yaml
+alias: 'Entryway Smart Welcome - Door & Motion Confirmed'
+mode: single  ## Prevents overlapping executions
+triggers: 
+  - platform: event
+    event_type: sia_event
+    event_data:
+      code: 'BA' ## Burglary Alarm
+      ri: 7  ## Group 1 with Entryway DoorProtect sensor (Door opened)
+    id: door_opened ##lets use trigger IDs for conditions
+  - platform: event
+    event_type: sia_event
+    event_data:
+      code: 'BA'
+      ri: 8  ## Group 2 with Entryway MotionProtect sensor (Motion detected)
+    id: motion_detected
+conditions: []
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger ##only DoorProtect sensor can start automation
+            id: door_opened 
+        sequence: 
+          - wait_for_trigger: ## this we will wait 60s for MotionProtect to also send BA code
+              - platform: event
+                event_type: sia_event
+                event_data:
+                  code: 'BA'
+                  ri: 8
+            timeout:
+              seconds: 60
+            continue_on_timeout: false
+          - service: tts.speak
+            metadata: {}
+            data:
+              cache: true ##lets add tts message to cache since it will be used a lot
+              media_player_entity_id: media_player.entryway_speaker
+              message: "Entryway door opened. Welcome home, brave traveller!"
+            target:
+              entity_id: tts.google_en_com ##I have learned that it's best to use googles tts
+```
+
+</details>
+   
+   * **Example 2 - ✨ Smart TTS Welcome Automation (with multi-sensor verification)**: 
+   Assumes we have an Entryway with:
+   - Smart speaker(media player)
+   - AJAX DoorProtect sensor on the door in Group 1(ri: 7)
+   - AJAX MotionProtect sensor inside the room in Group 2(ri: 8)
+
+   This Automation will check if Entryway door was opened(BA code fired) and wait for Entryway IR sensor to also fire BA(someone has entered room, not just opened door)
+
+<details>
+<summary>📄 Lets take a look at YAML(see comments): (Click to Expand)</summary>
+
+```yaml
+alias: 'Entryway Smart Welcome - Door & Motion Confirmed'
+mode: single  ## Prevents overlapping executions
+triggers: 
+  - platform: event
+    event_type: sia_event
+    event_data:
+      code: 'BA' ## Burglary Alarm
+      ri: 7  ## Group 1 with Entryway DoorProtect sensor (Door opened)
+    id: door_opened ##lets use trigger IDs for conditions
+  - platform: event
+    event_type: sia_event
+    event_data:
+      code: 'BA'
+      ri: 8  ## Group 2 with Entryway MotionProtect sensor (Motion detected)
+    id: motion_detected
+conditions: []
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger ##only DoorProtect sensor can start automation
+            id: door_opened 
+        sequence: 
+          - wait_for_trigger: ## this we will wait 60s for MotionProtect to also send BA code
+              - platform: event
+                event_type: sia_event
+                event_data:
+                  code: 'BA'
+                  ri: 8
+            timeout:
+              seconds: 60
+            continue_on_timeout: false
+          - service: tts.speak
+            metadata: {}
+            data:
+              cache: true ##lets add tts message to cache since it will be used a lot
+              media_player_entity_id: media_player.entryway_speaker
+              message: "Entryway door opened. Welcome home, brave traveller!"
+            target:
+              entity_id: tts.google_en_com ##I have learned that it's best to use googles tts
+```
+
+</details>
+   
+
 
 ---
 
