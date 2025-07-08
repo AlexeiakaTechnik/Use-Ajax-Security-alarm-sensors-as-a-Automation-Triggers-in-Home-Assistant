@@ -18,7 +18,8 @@ _Article on my project on how to use AJAX Security Alarm System sensors(IR) as m
 
 ---
 
-### 🚪 Introduction / Hook
+### 🚪 Introduction / Hook [Back to Table of Contents]
+<sub>[⬆️ Back to Table of Contents](#table-of-contents)</sub>
 
 <!-- Write an engaging intro about the closed nature of AJAX systems.  
 Briefly recap your prior AJAX project (relay hack) and why this SIA automation was your next step.  
