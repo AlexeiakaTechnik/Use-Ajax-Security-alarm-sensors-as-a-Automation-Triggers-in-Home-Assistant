@@ -18,7 +18,7 @@ _Article on my project on how to use AJAX Security Alarm System sensors(IR) as m
 
 ---
 
-### 🚪 Introduction / Hook <sub>[⬆️ Back to Table of Contents](#table-of-contents)</sub>
+### 🚪 Introduction / Hook               <sub>[⬆️ Back to Table of Contents](#table-of-contents)</sub>
 
 <!-- Write an engaging intro about the closed nature of AJAX systems.  
 Briefly recap your prior AJAX project (relay hack) and why this SIA automation was your next step.  
@@ -26,7 +26,7 @@ Mention why this method unlocks powerful automations for others. -->
 
 ---
 
-### 🧠 Learning the AJAX System
+### 🧠 Learning the AJAX System               <sub>[⬆️ Back to Table of Contents](#table-of-contents)</sub>
 
 <!-- Describe the SIA Protocol briefly.  
 Explain how AJAX uses it to send event notifications.  
@@ -35,7 +35,7 @@ Explain your goal: capture these SIA messages and turn them into Home Assistant 
 
 ---
 
-### 🔍 Tracing SIA Events in Home Assistant
+### 🔍 Tracing SIA Events in Home Assistant               <sub>[⬆️ Back to Table of Contents](#table-of-contents)</sub>
 
 <!-- Explain how to use Developer Tools → Events in HA to monitor SIA events on the Event Bus.  
 Document example SIA event payloads you captured, including arm/disarm/intrusion events.  
@@ -56,7 +56,7 @@ Example event payload (for illustration):
 
 ---
 
-### ⚙️ Integrating with Home Assistant Automations
+### ⚙️ Integrating with Home Assistant Automations               <sub>[⬆️ Back to Table of Contents](#table-of-contents)</sub>
 <!-- Show how to build automations based on captured SIA events. Explain your YAML structure step by step. Include a minimal, clean automation example with clear comments. -->
 
 Example Automation - YAML
@@ -77,22 +77,22 @@ mode: single
 
 ---
 
-### 💡 Example Automations & Use Cases
+### 💡 Example Automations & Use Cases               <sub>[⬆️ Back to Table of Contents](#table-of-contents)</sub>
 <!-- Share your actual real-life automation use cases with AJAX + Home Assistant. Possible examples: - Auto-lights on intrusion - Notification to phone when alarm armed/disarmed - Mode switching based on alarm state Keep it clean and to the point. --> <!-- Also mention you’ve documented dashboard integrations elsewhere, with links to your dashboard article. -->
 
 ---
 
-### 🛠️ Challenges & Lessons Learned
+### 🛠️ Challenges & Lessons Learned               <sub>[⬆️ Back to Table of Contents](#table-of-contents)</sub>
 <!-- Document the common problems you faced: - Event noise / duplicate events - Timing issues / latency - Failsafe considerations - How you solved or mitigated them -->
 
 ---
 
-### 🌐 Conclusion & Bigger Picture
+### 🌐 Conclusion & Bigger Picture               <sub>[⬆️ Back to Table of Contents](#table-of-contents)</sub>
 <!-- Reflect on why this method matters, not only for home users but also in industrial or legacy system integrations. Reinforce your key message: "Sometimes you don’t need official APIs—you just need patience, observation, and smart automation." -->
 
 ---
 
-### 📄 Appendix: YAML & SIA Configurations
+### 📄 Appendix: YAML & SIA Configurations               <sub>[⬆️ Back to Table of Contents](#table-of-contents)</sub>
 <!-- Include your full working SIA integration YAML here (with sensitive info redacted). Provide several automation snippets as ready-to-use examples. -->
 
 📄 Example SIA Configuration:
@@ -123,19 +123,19 @@ mode: single
 
 ---
 
-### 🪪 License
+### 🪪 License               <sub>[⬆️ Back to Table of Contents](#table-of-contents)</sub>
 
 This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-### 👨‍💻 Author and Inspiration
+### 👨‍💻 Author and Inspiration               <sub>[⬆️ Back to Table of Contents](#table-of-contents)</sub>
 
 Created by [Alexei](https://github.com/AlexeiakaTechnik) — field integrator, systems tinkerer, and smart home architect in the making. 
 
 ---
 
-### 🔗 Related Projects & Resources
+### 🔗 Related Projects & Resources               <sub>[⬆️ Back to Table of Contents](#table-of-contents)</sub>
 
 - ✅ [AJAX Security Integration In Home Assistant](https://github.com/AlexeiakaTechnik/AJAX_security-integration-in-Home_Assistant)  
 - ✅ [My experience of improving Light Automations in Smart Home powered by Home Assistant](https://github.com/AlexeiakaTechnik/My-experience-of-improving-Light-Automations-in-Home-Assistant)
