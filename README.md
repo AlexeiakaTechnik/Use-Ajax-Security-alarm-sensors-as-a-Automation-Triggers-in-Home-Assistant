@@ -4,17 +4,17 @@
 _Article on my project on how to use AJAX Security Alarm System sensors(IR) as movement detectors in Home Assistant. How to connect AJAX to HA using SIA protocol(Security Industry Association). How to trace SIA events sent to HA server, make sens of it and utilize for HA automations(Examples with Light Automations)_
 
 ## Table of Contents
-- [🚪 Introduction / Hook](#🚪-introduction--hook)
-- [🧠 Learning the AJAX System](#🧠-learning-the-ajax-system)
-- [🔍 Tracing SIA Events in Home Assistant](#🔍-tracing-sia-events-in-home-assistant)
-- [⚙️ Integrating with Home Assistant Automations](#⚙️-integrating-with-home-assistant-automations)
-- [💡 Example Automations & Use Cases](#💡-example-automations--use-cases)
-- [🛠️ Challenges & Lessons Learned](#🛠️-challenges--lessons-learned)
-- [🌐 Conclusion & Bigger Picture](#🌐-conclusion--bigger-picture)
-- [📄 Appendix: YAML & SIA Configurations](#📄-appendix-yaml--sia-configurations)
-- [🪪 License](#🪪-license)
-- [👨‍💻 Author and Inspiration](#👨‍💻-author-and-inspiration)
-- [🔗 Related Projects & Resources](#-related-projects--resources)
+- [🚪 Introduction / Hook](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#-introduction--hook)
+- [🧠 Learning the AJAX System](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#-learning-the-ajax-system)
+- [🔍 Tracing SIA Events in Home Assistant](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#-tracing-sia-events-in-home-assistant)
+- [⚙️ Integrating with Home Assistant Automations](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#%EF%B8%8F-integrating-with-home-assistant-automations)
+- [💡 Example Automations & Use Cases](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#-example-automations--use-cases)
+- [🛠️ Challenges & Lessons Learned](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#%EF%B8%8F-challenges--lessons-learned)
+- [🌐 Conclusion & Bigger Picture](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#-conclusion--bigger-picture)
+- [📄 Appendix: YAML & SIA Configurations](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#-appendix-yaml--sia-configurations)
+- [🪪 License](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#-license)
+- [👨‍💻 Author and Inspiration](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#-author-and-inspiration)
+- [🔗 Related Projects & Resources](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#-related-projects--resources)
 
 ---
 
