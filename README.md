@@ -73,7 +73,30 @@ Once decoded, you can easily detect events like:
 Document example SIA event payloads you captured, including arm/disarm/intrusion events.  
 Map the key fields in the event payload and explain their meaning. Refer to SIA Codes document.   -->
 
-Example event payload (for illustration):
+To automate based on SIA events, you first need to **see them**.
+
+In Home Assistant, everything revolves around the **[Event Bus](https://www.home-assistant.io/docs/configuration/events/)** — a sort of internal “conveyor belt” where all system events flow, and Integrations can fire their own custom events.  
+It’s the **Core**—the beating heart of the Home Assistant Operating System.
+
+If you go and listen to it using Developer Tools (as explained below) and simply monitor the most common event type — `state_changed` — you’ll notice something interesting:
+- In a **fresh, young Home Assistant install**, it’s like a slow, peaceful heartbeat—some time-based triggers here and there, sun position updates, maybe a device checking in now and then.
+- But in a **seasoned, mature, complex setup** — with 100+ devices and 100+ automations — it **roars**. Even at idle, it can easily hit **90+ events per minute**, just ticking over in its resting state. And when a cascade of actions is triggered…  
+You’ll feel the storm.
+
+Anyway, **Automations** listen to this Event Bus to act when specific conditions are met.
+
+To inspect incoming SIA events:
+1. Go to **Developer Tools → Events** in Home Assistant.
+2. In the **Listen to Events** box, enter:
+   ```plaintext
+   sia_event_<port>_<account>
+   ```
+   Where port is the port and account is Account ID(Object number) set up in AJAX APP Monitoring station config, see [AJAX](https://github.com/AlexeiakaTechnik/AJAX_security-integration-in-Home_Assistant/blob/main/README.md#%EF%B8%8F-ajax-system---devices-groups-and-sia-monitoring-station-setup) and [SIA](https://github.com/AlexeiakaTechnik/AJAX_security-integration-in-Home_Assistant/blob/main/README.md#-sia-alarm-systems-configuration) configuration.
+3. Click Start Listening.
+4. Arm, disarm, or trigger your AJAX detectors(wave hands, open doors) and watch the events appear in real-time.
+
+Example event payload (simplified for illustration):
+
 ```yaml
 {
   "event_type": "sia_event",
