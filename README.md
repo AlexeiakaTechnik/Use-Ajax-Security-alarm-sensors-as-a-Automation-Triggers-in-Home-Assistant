@@ -9,9 +9,7 @@ _Article on my project on how to use AJAX Security Alarm System sensors(IR) as m
 - [🔍 Tracing SIA Events in Home Assistant](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#-tracing-sia-events-in-home-assistant---------------%EF%B8%8F-back-to-table-of-contents)
 - [⚙️ Integrating with Home Assistant Automations](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#%EF%B8%8F-integrating-with-home-assistant-automations---------------%EF%B8%8F-back-to-table-of-contents)
 - [💡 Example Automations & Use Cases](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#-example-automations--use-cases---------------%EF%B8%8F-back-to-table-of-contents)
-- [🛠️ Challenges & Lessons Learned](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#%EF%B8%8F-challenges--lessons-learned---------------%EF%B8%8F-back-to-table-of-contents)
 - [🌐 Conclusion & Bigger Picture](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#-conclusion--bigger-picture---------------%EF%B8%8F-back-to-table-of-contents)
-- [📄 Appendix: YAML & SIA Configurations](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#-appendix-yaml--sia-configurations---------------%EF%B8%8F-back-to-table-of-contents)
 - [🪪 License](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#-license---------------%EF%B8%8F-back-to-table-of-contents)
 - [👨‍💻 Author and Inspiration](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#-author-and-inspiration---------------%EF%B8%8F-back-to-table-of-contents)
 - [🔗 Related Projects & Resources](https://github.com/AlexeiakaTechnik/Use-Ajax-Security-alarm-sensors-as-a-Automation-Triggers-in-Home-Assistant/blob/main/README.md#-related-projects--resources---------------%EF%B8%8F-back-to-table-of-contents)
@@ -222,7 +220,7 @@ This is the simplest implementation of light automation and it WILL have a lot o
 ### 💡 Example Automations & Use Cases               <sub>[⬆️ Back to Table of Contents](#table-of-contents)</sub>
 <!-- Share your actual real-life automation use cases with AJAX + Home Assistant. Possible examples: - Auto-lights on intrusion - Notification to phone when alarm armed/disarmed - Mode switching based on alarm state Keep it clean and to the point. --> <!-- Also mention you’ve documented dashboard integrations elsewhere, with links to your dashboard article. -->
 
-To expand usage of our AJAX system I have preapared a few examples of automations. Some of them may or may not be used by me in my setup at the moment ;)
+To expand usage of our AJAX system I have preapared a few examples of automations. Some of them may or may not be used by me in my setup at the moment. Those are just obvious examples, but you can integrate AJAX devices in your smart home setup however you like! Just treat them as individual/grouped(depends on group setup in AJAX) sensors with a number of states. Like binary door/windows sensors for DoorProtect or motion detectors for MotionProtect.
 
    * **Example 1 - ✨ Smart TTS Welcome Automation (with multi-sensor verification)**: 
    Assumes we have an Entryway with:
@@ -230,7 +228,7 @@ To expand usage of our AJAX system I have preapared a few examples of automation
    - AJAX DoorProtect sensor on the door in Group 1(ri: 7)
    - AJAX MotionProtect sensor inside the room in Group 2(ri: 8)
 
-   This Automation will check if Entryway door was opened(BA code fired) and wait for Entryway IR sensor to also fire BA(someone has entered room, not just opened door)
+   This Automation will check if Entryway door was opened(BA code fired) and wait for Entryway IR sensor to also fire BA(someone has entered room, not just opened the door), and send TTS Message to speaker afterwards.
 
 <details>
 <summary>📄 Lets take a look at YAML(see comments): (Click to Expand)</summary>
@@ -279,103 +277,265 @@ actions:
 
 </details>
    
-   * **Example 2 - ✨ Smart TTS Welcome Automation (with multi-sensor verification)**: 
-   Assumes we have an Entryway with:
+   * **Example 2 - ✨ HVAC Automatic Shutdown and Restart on Door/Window opened&closed**: 
+   Assumes we have a room with Door and/or Window:
    - Smart speaker(media player)
+   - HVAC System(air conditioner or climate control device(
    - AJAX DoorProtect sensor on the door in Group 1(ri: 7)
-   - AJAX MotionProtect sensor inside the room in Group 2(ri: 8)
+   - AJAX DoorProtect sensor on the window in Group 1(ri: 7)
 
-   This Automation will check if Entryway door was opened(BA code fired) and wait for Entryway IR sensor to also fire BA(someone has entered room, not just opened door)
+   This Automation will check if door was opened(BA code fired) and wait for 5 minutes, if door was not closed in 5 minutes - the HVAC will shut down. If the door was closed and not opened again - the HVAC will be turned back on. Text-To-Speech audio messages will be added for help.
 
 <details>
 <summary>📄 Lets take a look at YAML(see comments): (Click to Expand)</summary>
 
 ```yaml
-alias: 'Entryway Smart Welcome - Door & Motion Confirmed'
-mode: single  ## Prevents overlapping executions
-triggers: 
+alias: 'HVAC Auto Pause/Resume - Door & Window with Grace Periods'
+mode: restart  ## Only one instance runs, cancels prior ones if retriggered
+triggers:
   - platform: event
     event_type: sia_event
     event_data:
-      code: 'BA' ## Burglary Alarm
-      ri: 7  ## Group 1 with Entryway DoorProtect sensor (Door opened)
-    id: door_opened ##lets use trigger IDs for conditions
+      code: 'BA' ##Burglary Alarm
+      ri: 7  ## DoorProtect - Window or Door opened
+    id: door_opened
   - platform: event
     event_type: sia_event
     event_data:
-      code: 'BA'
-      ri: 8  ## Group 2 with Entryway MotionProtect sensor (Motion detected)
-    id: motion_detected
+      code: 'BR' ##Alarm Restored
+      ri: 7  ## DoorProtect - Window or Door closed
+    id: door_closed
 conditions: []
 actions:
   - choose:
       - conditions:
-          - condition: trigger ##only DoorProtect sensor can start automation
-            id: door_opened 
-        sequence: 
-          - wait_for_trigger: ## this we will wait 60s for MotionProtect to also send BA code
+          - condition: trigger
+            id: door_opened
+        sequence:
+          - delay: "00:05:00"  # Wait 5 minutes to check door/window state
+          - wait_for_trigger:
+              - platform: event
+                event_type: sia_event
+                event_data:
+                  code: 'BR'
+                  ri: 2  ## Door/Window closed
+            timeout: "00:00:01"  # Immediately check after delay
+            continue_on_timeout: true
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ wait.trigger is none }}" ##check if wait period expired
+                sequence:
+                  - service: climate.set_hvac_mode
+                    target:
+                      entity_id: climate.living_room
+                    data:
+                      hvac_mode: 'off'
+                  - service: tts.speak
+                    metadata: {}
+                    data:
+                      cache: true
+                      media_player_entity_id: media_player.living_room_speaker
+                      message: "HVAC paused. Door or Window remained open for over 5 minutes."
+                    target:
+                      entity_id: tts.google_en_com
+
+      - conditions:
+          - condition: trigger
+            id: door_closed
+        sequence:
+          - delay: "00:05:00"  ## Grace period after door closes
+          - wait_for_trigger:
               - platform: event
                 event_type: sia_event
                 event_data:
                   code: 'BA'
-                  ri: 8
-            timeout:
-              seconds: 60
-            continue_on_timeout: false
-          - service: tts.speak
-            metadata: {}
-            data:
-              cache: true ##lets add tts message to cache since it will be used a lot
-              media_player_entity_id: media_player.entryway_speaker
-              message: "Entryway door opened. Welcome home, brave traveller!"
-            target:
-              entity_id: tts.google_en_com ##I have learned that it's best to use googles tts
+                  ri: 2  ## Door opened again
+            timeout: "00:00:01"
+            continue_on_timeout: true
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ wait.trigger is none }}"
+                sequence:
+                  - service: climate.set_hvac_mode
+                    target:
+                      entity_id: climate.living_room
+                    data:
+                      hvac_mode: 'heat'  ## Adjust mode as needed
+                  - service: tts.speak
+                    metadata: {}
+                    data:
+                      cache: true
+                      media_player_entity_id: media_player.living_room_speaker
+                      message: "HVAC resumed. Door stayed closed for 5 minutes."
+                    target:
+                      entity_id: tts.google_en_com
+
 ```
 
 </details>
    
 
+   * **Example 3 - ✨ Visual and Audio Indication of ALARM State**: 
+   Assumes we have any AJAX Setup and Smart Home with:
+   - Smart speaker(media player)
+   - Ambient RGB LED Lights
 
----
+   This Automation will indicate if Alarm is in Armed/Disarmed/in Night Mode sates via RGB LED entity, with TTS messages indicating change of alarm state. If Alarm is Triggered - flashing Lights and repeating TTS until Alarm is Disarmed.
 
-### 🛠️ Challenges & Lessons Learned               <sub>[⬆️ Back to Table of Contents](#table-of-contents)</sub>
-<!-- Document the common problems you faced: - Event noise / duplicate events - Timing issues / latency - Failsafe considerations - How you solved or mitigated them -->
+<details>
+<summary>📄 Lets take a look at YAML(see comments): (Click to Expand)</summary>
+
+```yaml
+alias: 'Alarm State Visual & TTS Indication (No Helpers)'
+mode: restart  ## Prevent overlapping runs
+trigger:
+  - platform: event
+    event_type: sia_event
+    event_data:
+      code: 'CL'  ## Armed Away
+      ri: 10  ## Device group(any will do for this automation)
+    id: armed_away
+  - platform: event
+    event_type: sia_event
+    event_data:
+      code: 'OP'  ## Disarmed
+      ri: 10
+    id: disarmed
+  - platform: event
+    event_type: sia_event
+    event_data:
+      code: 'NL'  ## Night Mode
+      ri: 10
+    id: night_mode
+  - platform: event
+    event_type: sia_event
+    event_data:
+      code: 'BA'  ## Triggered
+      ri: 10
+    id: triggered
+variables:
+  last_state: "{{ state_attr(alarm_control_panel.room_x_pir_motion_sensor, 'last_state') | default('disarmed') }}" ## We use this variable to track last state of the alarm to start flashing lights only if it went from Armed Away/Night to Triggered
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: armed_away
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: light.ambient_rgb_led
+            data:
+              brightness_pct: 70
+              rgb_color: [255, 0, 0] ## Red color
+          - service: tts.speak
+            metadata: {}
+            data:
+              cache: true
+              media_player_entity_id: media_player.house_speaker
+              message: "Security Alarm was Armed Away"
+            target:
+              entity_id: tts.google_en_com
+          - service: automation.set_state ##Automation self-stores its previous state using the undocumented but common HA trick of setting its own state (via automation.set_state).
+            data:
+              entity_id: automation.alarm_state_visual_tts_indication_no_helpers
+              state: "armed_away"
+      - conditions:
+          - condition: trigger
+            id: disarmed
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: light.ambient_rgb_led
+            data:
+              brightness_pct: 50
+              rgb_color: [0, 255, 0] ## Green color
+          - service: tts.speak
+            metadata: {}
+            data:
+              cache: true
+              media_player_entity_id: media_player.house_speaker
+              message: "Alarm was Disarmed"
+            target:
+              entity_id: tts.google_en_com
+          - service: automation.set_state
+            data:
+              entity_id: automation.alarm_state_visual_tts_indication_no_helpers
+              state: "disarmed"
+      - conditions:
+          - condition: trigger
+            id: night_mode
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: light.ambient_rgb_led
+            data:
+              brightness_pct: 25
+              rgb_color: [128, 0, 128]
+          - service: tts.speak
+            metadata: {}
+            data:
+              cache: true
+              media_player_entity_id: media_player.house_speaker
+              message: "Night Mode engaged for Security Alarm"
+            target:
+              entity_id: tts.google_en_com
+          - service: automation.set_state
+            data:
+              entity_id: automation.alarm_state_visual_tts_indication_no_helpers
+              state: "night_mode"
+
+      - conditions:
+          - condition: trigger
+            id: triggered
+          - condition: template
+            value_template: >
+              {{ last_state in ['armed_away', 'night_mode'] }} ## Check if last state variable is in Armed Away/Night mode
+        sequence:
+          - repeat: ## repeat sequence will give us flashing red light and TTS untill alarm is disarmed
+              while:
+                - condition: template
+                  value_template: >
+                    {{ last_state in ['armed_away', 'night_mode'] }}
+              sequence:
+                - service: light.turn_on
+                  target:
+                    entity_id: light.ambient_rgb_led
+                  data:
+                    brightness_pct: 100
+                    rgb_color: [255, 0, 0]
+                - delay: "00:00:03" ## Delays for turning on and off LEDs
+                - service: light.turn_off
+                  target:
+                    entity_id: light.ambient_rgb_led
+                - delay: "00:00:03" ##
+                - service: tts.speak
+                  metadata: {}
+                  data:
+                    cache: true
+                    media_player_entity_id: media_player.house_speaker
+                    message: "Security Alarm Triggered!"
+                  target:
+                    entity_id: tts.google_en_com
+                - delay: "00:00:15" ## delay for repeating TTS 
+
+
+```
+
+</details>
 
 ---
 
 ### 🌐 Conclusion & Bigger Picture               <sub>[⬆️ Back to Table of Contents](#table-of-contents)</sub>
 <!-- Reflect on why this method matters, not only for home users but also in industrial or legacy system integrations. Reinforce your key message: "Sometimes you don’t need official APIs—you just need patience, observation, and smart automation." -->
 
----
+Primary purpose of this guide was to explain that in your Smart Home or Office/other site you can still use devices which are standing by a lot of time. This is a good practice for saving on Smart Home system cost and optimizing load on your system - you have already paid for Security Alarm, AJAX or other vendor, why not put it to greater use and claim maximized value? The logic of using the security system while in  standby/disarmed will not contradict security concerns since additional automations are not needed once there is no one in the building. But it's important to also understand that such devices are limited in this use-case and are purposely built for security, not daily automations. Dedicated Motion/Presence or Opening sensors will have many advantages, like being independant, not limited by groups, having greater integration flexibility and probably lower cost if compared 1:1 with AJAX or other security system sensors. 
 
-### 📄 Appendix: YAML & SIA Configurations               <sub>[⬆️ Back to Table of Contents](#table-of-contents)</sub>
-<!-- Include your full working SIA integration YAML here (with sensitive info redacted). Provide several automation snippets as ready-to-use examples. -->
+Personally - I am very satisfied with my own home-lab setup, and I find it very convinient to use AJAX's MotionProtect sensors for Light Automations in areas less demanding of precision and comfort such as hallways, courtyards, stairs, etc. For living areas, kitchens, bedrooms such sensors are simply too hardware-limited, however sophisticated your automation logic is. 
 
-📄 Example SIA Configuration:
+I hope you will find this article helpful and insightful and maybe try this out with other vendors/brands, since SIA protocol is a very common thing for security industry! If you have any ideas, questions or suggestions - I would gladly be of help, just email me or create Github issue! Best of luck with improving and optimizing your Smart Home!
 
-```yaml
-sia_accounts:
-  - account: '1234'
-    encryption_key: 'ABCDEF1234567890ABCDEF1234567890'
-    ping_interval: 3600
-    allowed_time_diff: 30
-```
-
-📄 Example Automation:
-
-```yaml
-alias: 'AJAX System Armed Notification'
-trigger:
-  - platform: event
-    event_type: sia_event
-    event_data:
-      code: 'CL'
-action:
-  - service: notify.mobile_app
-    data:
-      message: 'AJAX Security System Armed'
-mode: single
-```
 
 ---
 
