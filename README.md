@@ -1,4 +1,4 @@
-[Insert intro image here]
+![cover](https://github.com/user-attachments/assets/b01e486e-b233-4ca1-9604-9214e8e910d3)
 
 # How to use Ajax Security Alarm sensors as an Automation triggers in Home Assistant.
 _Article on my project on how to use AJAX Security Alarm System sensors(IR) as movement detectors in Home Assistant. How to connect AJAX to HA using SIA protocol(Security Industry Association). How to trace SIA events sent to HA server, make sens of it and utilize for HA automations(Examples with Light Automations)_
