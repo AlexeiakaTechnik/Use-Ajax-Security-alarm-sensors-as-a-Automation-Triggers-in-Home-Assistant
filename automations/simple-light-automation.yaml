@@ -1,0 +1,23 @@
+alias: 'Room X Lights On for 1m30s' 
+triggers:
+  - platform: event
+    event_type: sia_event ## set event type
+    event_data:
+      code: BA ## this is fired when AJAX MotionProtect device is armed(24/7 in our setup) and detects new motion/loud sound event
+      ri: "8" ## this is Group(Zone) which AJAX MotionProtect device is attached to
+conditions:
+  - condition: state
+    entity_id: light.room_x_lights 
+    state: "off" ## lets not fire automation when light is already On in the room X
+actions:
+  - action: light.turn_on ##turn on the light
+    target:
+      entity_id: light.room_x_lights
+  - delay:
+       hours: 0
+       minutes: 1
+       seconds: 30 ## delay for 1m30s
+  - action: light.turn_off
+    target:
+      entity_id: light.room_x_lights ## and turn off the light
+mode: single

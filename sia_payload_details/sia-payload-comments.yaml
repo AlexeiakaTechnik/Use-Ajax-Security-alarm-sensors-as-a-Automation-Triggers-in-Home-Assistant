@@ -1,0 +1,32 @@
+{
+event_type: sia_event_xxx_AAA34 ##where xxx is my port and AAA34 - user id
+data:
+  message_type: SIA-DCS ##Type of SIA message (usually "SIA-DCS" for standard events).
+  receiver: null ##Receiver ID — usually the port or system receiving the event, not important
+  line: L0 ##Communication line/channel (often unused in simple setups). All my events are L0
+  account: AAA34 ##obvious
+  sequence: "5277" ##	Message sequence number (for ordering).
+  content: "#AAA34|Nri8/BA15]_12:06:34,07-08-2025" ##	Full raw SIA message content (undecoded text, rarely needed in automations).
+  ti: null ##	Transmission Identifier—technical field from SIA message (rarely needed).
+  id: null ## Identifier field from SIA message (may duplicate account or zone in some cases).
+  ri: "8" ## THIS is important! Zone or sensor triggering the event. Critical for identifying which device caused the event - zones(Groups) are configured in AJAX App
+  code: BA ## SIA Event Code (e.g., "BA" for Burglary Alarm, "CL" for Closing/Arming). Key for automations. Link to doc in article at the end.
+  message: "15" ## Human-readable description of the event (mapped from code, like "Burglary Alarm").
+  x_data: null ## Extended data included in some SIA messages (usually advanced or manufacturer-specific details).
+  timestamp: "2025-07-08T12:06:34+00:00" ## 	Time of the event.
+  event_qualifier: null ## SIA Qualifier (like "new event" vs. "restore")—used in some events for extra context.
+  event_type: null ##Same as *code* in some cases; sometimes more generalized type info.
+  partition: null ## Partition number—relevant for multi-partition systems (often unused in basic setups).
+  extended_data: null ## Additional extended data (structured, list format)—rare in most home security SIA events.
+  sia_code: ## This one is new, it used to be just the BA/BR/etc. codes, but now its explained! cool!
+    code: BA
+    type: Burglary Alarm
+    description: Burglary zone has been violated while armed
+    concerns: Zone or point ## What this event concerns (e.g., specific zone, device, or system-wide event). Useful for filtering.
+origin: LOCAL ## Where the event originated. "LOCAL" means it was triggered from within Home Assistant itself (versus cloud or external sources).
+time_fired: "2025-07-08T12:06:14.503616+00:00" ## Exact timestamp (UTC) when the event was fired inside Home Assistant.
+context: ## Standard HA context object for event tracking, includes:
+  id: 01JZMYVW77S9JC3NY8TWJX72Z1 ## Unique ID for this specific event in HA’s logs (useful for debugging and linking events). 
+  parent_id: null ## ID of the parent event (if this event was triggered by another event/automation).
+  user_id: null ## ID of the user (if applicable) who triggered the event (usually null for automated events).
+}

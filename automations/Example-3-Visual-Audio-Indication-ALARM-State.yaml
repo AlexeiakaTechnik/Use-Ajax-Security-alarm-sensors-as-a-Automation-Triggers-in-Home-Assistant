@@ -1,0 +1,132 @@
+alias: 'Alarm State Visual & TTS Indication (No Helpers)'
+mode: restart  ## Prevent overlapping runs
+trigger:
+  - platform: event
+    event_type: sia_event
+    event_data:
+      code: 'CL'  ## Armed Away
+      ri: 10  ## Device group(any will do for this automation)
+    id: armed_away
+  - platform: event
+    event_type: sia_event
+    event_data:
+      code: 'OP'  ## Disarmed
+      ri: 10
+    id: disarmed
+  - platform: event
+    event_type: sia_event
+    event_data:
+      code: 'NL'  ## Night Mode
+      ri: 10
+    id: night_mode
+  - platform: event
+    event_type: sia_event
+    event_data:
+      code: 'BA'  ## Triggered
+      ri: 10
+    id: triggered
+variables:
+  last_state: "{{ state_attr(alarm_control_panel.room_x_pir_motion_sensor, 'last_state') | default('disarmed') }}" ## We use this variable to track last state of the alarm to start flashing lights only if it went from Armed Away/Night to Triggered
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: armed_away
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: light.ambient_rgb_led
+            data:
+              brightness_pct: 70
+              rgb_color: [255, 0, 0] ## Red color
+          - service: tts.speak
+            metadata: {}
+            data:
+              cache: true
+              media_player_entity_id: media_player.house_speaker
+              message: "Security Alarm was Armed Away"
+            target:
+              entity_id: tts.google_en_com
+          - service: automation.set_state ##Automation self-stores its previous state using the undocumented but common HA trick of setting its own state (via automation.set_state).
+            data:
+              entity_id: automation.alarm_state_visual_tts_indication_no_helpers
+              state: "armed_away"
+      - conditions:
+          - condition: trigger
+            id: disarmed
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: light.ambient_rgb_led
+            data:
+              brightness_pct: 50
+              rgb_color: [0, 255, 0] ## Green color
+          - service: tts.speak
+            metadata: {}
+            data:
+              cache: true
+              media_player_entity_id: media_player.house_speaker
+              message: "Alarm was Disarmed"
+            target:
+              entity_id: tts.google_en_com
+          - service: automation.set_state
+            data:
+              entity_id: automation.alarm_state_visual_tts_indication_no_helpers
+              state: "disarmed"
+      - conditions:
+          - condition: trigger
+            id: night_mode
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: light.ambient_rgb_led
+            data:
+              brightness_pct: 25
+              rgb_color: [128, 0, 128]
+          - service: tts.speak
+            metadata: {}
+            data:
+              cache: true
+              media_player_entity_id: media_player.house_speaker
+              message: "Night Mode engaged for Security Alarm"
+            target:
+              entity_id: tts.google_en_com
+          - service: automation.set_state
+            data:
+              entity_id: automation.alarm_state_visual_tts_indication_no_helpers
+              state: "night_mode"
+
+      - conditions:
+          - condition: trigger
+            id: triggered
+          - condition: template
+            value_template: >
+              {{ last_state in ['armed_away', 'night_mode'] }} ## Check if last state variable is in Armed Away/Night mode
+        sequence:
+          - repeat: ## repeat sequence will give us flashing red light and TTS untill alarm is disarmed
+              while:
+                - condition: template
+                  value_template: >
+                    {{ last_state in ['armed_away', 'night_mode'] }}
+              sequence:
+                - service: light.turn_on
+                  target:
+                    entity_id: light.ambient_rgb_led
+                  data:
+                    brightness_pct: 100
+                    rgb_color: [255, 0, 0]
+                - delay: "00:00:03" ## Delays for turning on and off LEDs
+                - service: light.turn_off
+                  target:
+                    entity_id: light.ambient_rgb_led
+                - delay: "00:00:03" ##
+                - service: tts.speak
+                  metadata: {}
+                  data:
+                    cache: true
+                    media_player_entity_id: media_player.house_speaker
+                    message: "Security Alarm Triggered!"
+                  target:
+                    entity_id: tts.google_en_com
+                - delay: "00:00:15" ## delay for repeating TTS 
+

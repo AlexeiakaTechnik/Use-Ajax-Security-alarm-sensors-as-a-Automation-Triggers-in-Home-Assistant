@@ -1,0 +1,39 @@
+alias: 'Entryway Smart Welcome - Door & Motion Confirmed'
+mode: single  ## Prevents overlapping executions
+triggers: 
+  - platform: event
+    event_type: sia_event
+    event_data:
+      code: 'BA' ## Burglary Alarm
+      ri: 7  ## Group 1 with Entryway DoorProtect sensor (Door opened)
+    id: door_opened ##lets use trigger IDs for conditions
+  - platform: event
+    event_type: sia_event
+    event_data:
+      code: 'BA'
+      ri: 8  ## Group 2 with Entryway MotionProtect sensor (Motion detected)
+    id: motion_detected
+conditions: []
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger ##only DoorProtect sensor can start automation
+            id: door_opened 
+        sequence: 
+          - wait_for_trigger: ## this we will wait 60s for MotionProtect to also send BA code
+              - platform: event
+                event_type: sia_event
+                event_data:
+                  code: 'BA'
+                  ri: 8
+            timeout:
+              seconds: 60
+            continue_on_timeout: false
+          - service: tts.speak
+            metadata: {}
+            data:
+              cache: true ##lets add tts message to cache since it will be used a lot
+              media_player_entity_id: media_player.entryway_speaker
+              message: "Entryway door opened. Welcome home, brave traveller!"
+            target:
+              entity_id: tts.google_en_com ##I have learned that it's best to use googles tts
